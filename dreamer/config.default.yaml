@@ -1,0 +1,57 @@
+# Default night configuration.
+# Each stage can route to a different provider/model so you can mix cost/quality.
+
+night:
+  num_cycles: 3          # full NREM→REM cycles per night
+  base_rem_turns: 4      # dream "turns" in the first REM; grows +30% per cycle
+  lucid_enabled: true
+  nightmare_enabled: true
+  nightmare_min_cycle: 1 # earliest cycle index at which nightmares may appear
+
+# Sampling / dream quality controls per stage.
+# Temperatures mirror the biology: deep sleep is low-entropy consolidation,
+# REM is high-entropy recombination.
+stages:
+  n1_drift:     { temperature: 0.3, top_p: 0.9, max_tokens: 400 }
+  n2_spindle:   { temperature: 0.4, top_p: 0.9, max_tokens: 600 }
+  n3_deep:      { temperature: 0.2, top_p: 0.7, max_tokens: 900 }
+  rem:          { temperature: 1.0, top_p: 0.98, max_tokens: 1200 }
+  nightmare:    { temperature: 1.1, top_p: 0.95, max_tokens: 1000 }
+  lucid:        { temperature: 0.8, top_p: 0.9,  max_tokens: 1000 }
+  reflection:   { temperature: 0.5, top_p: 0.9,  max_tokens: 1400 }
+
+# Each stage picks a provider+model. Unset -> use `default`.
+# Model IDs verified April 2026:
+#   - Google: queried via /v1beta/models (preview tags current at time of writing)
+#   - Anthropic: claude-sonnet-4-7 / claude-haiku-4-7 / claude-opus-4-7
+#   - OpenAI:   gpt-5.5 / gpt-5.5-mini / gpt-5.5-nano
+# Swap freely; only stages whose provider has an API key set will run.
+routing:
+  default:      { provider: anthropic, model: claude-haiku-4-7 }
+  n1_drift:     { provider: anthropic, model: claude-haiku-4-7 }
+  n2_spindle:   { provider: anthropic, model: claude-haiku-4-7 }
+  n3_deep:      { provider: anthropic, model: claude-haiku-4-7 }
+  rem:          { provider: anthropic, model: claude-sonnet-4-7 }
+  nightmare:    { provider: google,    model: gemini-3.1-pro-preview }
+  lucid:        { provider: anthropic, model: claude-sonnet-4-7 }
+  reflection:   { provider: anthropic, model: claude-opus-4-7 }
+
+# Salience weights drive which memories get replayed.
+salience:
+  surprise: 1.0        # |reward - expected|
+  arousal: 0.8         # emotional intensity
+  recency: 0.5         # exponential decay
+  forget_boost: 0.4    # under-rehearsed things replay more
+  goal_relevance: 0.7
+
+# Nightmare difficulty is targeted to the zone of proximal development.
+nightmare:
+  target_success_rate: 0.35
+  max_attempts: 3
+  trauma_seed_k: 3
+
+# Consolidation pipeline. Anything touching values/goals needs a human gate.
+consolidation:
+  auto_apply_facts: true
+  auto_apply_skills: false     # requires human review in this POC
+  auto_apply_values: false     # never auto in this POC
