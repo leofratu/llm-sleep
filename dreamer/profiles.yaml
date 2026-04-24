@@ -1,0 +1,63 @@
+# Alternative routing profiles.
+# Pass to the CLI:  dreamer sleep --config dreamer/profiles/<name>.yaml
+#
+# Each profile is a *partial* override of config.default.yaml. In this POC
+# the CLI reads a full config; copy-paste what you need.
+
+# --------------------------------------------------------------------------
+# cheap: minimize cost. Use small models everywhere.
+# --------------------------------------------------------------------------
+cheap:
+  routing:
+    default:    { provider: anthropic, model: claude-haiku-4-7 }
+    n1_drift:   { provider: openai,    model: gpt-5.5-nano }
+    n2_spindle: { provider: openai,    model: gpt-5.5-nano }
+    n3_deep:    { provider: anthropic, model: claude-haiku-4-7 }
+    rem:        { provider: openai,    model: gpt-5.5-mini }
+    nightmare:  { provider: google,    model: gemini-3-flash-preview }
+    lucid:      { provider: openai,    model: gpt-5.5-mini }
+    reflection: { provider: openai,    model: gpt-5.5-mini }
+
+# --------------------------------------------------------------------------
+# frontier: best-available everywhere. Expect ~10x cost of `cheap`.
+# --------------------------------------------------------------------------
+frontier:
+  routing:
+    default:    { provider: anthropic, model: claude-opus-4-7 }
+    n1_drift:   { provider: anthropic, model: claude-sonnet-4-7 }
+    n2_spindle: { provider: anthropic, model: claude-sonnet-4-7 }
+    n3_deep:    { provider: anthropic, model: claude-opus-4-7 }
+    rem:        { provider: google,    model: gemini-3.1-pro-preview }
+    nightmare:  { provider: openai,    model: gpt-5.5 }
+    lucid:      { provider: anthropic, model: claude-opus-4-7 }
+    reflection: { provider: openai,    model: gpt-5.5 }
+
+# --------------------------------------------------------------------------
+# cross-vendor: every major provider gets at least one stage.
+# Useful for ablation studies ("does REM provider matter?").
+# --------------------------------------------------------------------------
+cross_vendor:
+  routing:
+    default:    { provider: anthropic, model: claude-haiku-4-7 }
+    n1_drift:   { provider: openai,    model: gpt-5.5-nano }
+    n2_spindle: { provider: google,    model: gemini-3.1-flash-lite-preview }
+    n3_deep:    { provider: anthropic, model: claude-haiku-4-7 }
+    rem:        { provider: anthropic, model: claude-sonnet-4-7 }
+    nightmare:  { provider: google,    model: gemini-3.1-pro-preview }
+    lucid:      { provider: openai,    model: gpt-5.5-mini }
+    reflection: { provider: anthropic, model: claude-opus-4-7 }
+
+# --------------------------------------------------------------------------
+# local: run everything through an OpenAI-compatible local server
+# (Ollama / LM Studio / vLLM). Set CUSTOM_BASE_URL + CUSTOM_API_KEY.
+# --------------------------------------------------------------------------
+local:
+  routing:
+    default:    { provider: custom, model: llama3.3:70b }
+    n1_drift:   { provider: custom, model: llama3.3:8b }
+    n2_spindle: { provider: custom, model: llama3.3:8b }
+    n3_deep:    { provider: custom, model: llama3.3:70b }
+    rem:        { provider: custom, model: llama3.3:70b }
+    nightmare:  { provider: custom, model: llama3.3:70b }
+    lucid:      { provider: custom, model: llama3.3:70b }
+    reflection: { provider: custom, model: llama3.3:70b }
